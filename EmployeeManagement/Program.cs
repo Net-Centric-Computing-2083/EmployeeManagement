@@ -15,12 +15,31 @@ app.MapGet("/employees", () =>
 {
     List<Employee> employees = new();
 
+    //1) using SqlConnection
     using SqlConnection con = new(connectionString);
+    
     string sql = "Select * from Employee";
 
+    // 2) SqlCommand
+    using SqlCommand cmd = new SqlCommand(sql, con);
     con.Open();
 
-    Console.WriteLine("This is testing");
+    //3) Execute Reader
+    using SqlDataReader reader = cmd.ExecuteReader();
+
+    while (reader.Read())
+    {
+        employees.Add(new Employee
+        {
+            Id = Convert.ToInt32(reader["Id"]),
+            Name = reader["Name"].ToString(),
+            DepartmentName = reader["Department_Name"].ToString(),
+            Designation = reader["Designation"].ToString(),
+            Email = reader["Email"].ToString(),
+            Address = reader["Address"].ToString(),
+            Gender = reader["Gender"].ToString()
+        });
+    }
 
 });
 
